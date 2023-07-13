@@ -117,6 +117,36 @@ class CustomLoginController extends Controller
             'email' => [trans('auth.failed')],
         ]);
     }
+    public function appLogin(Request $request)
+    {
+        // return response()->json(['access_token' => 'test'], 200);
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $ldapHost = "222.255.168.250"; // Địa chỉ IP của máy chủ LDAP
+        // $bindResult = bindldap($user, $pass, $ldapHost);
+        $check_pass = $this->bindldap($request->input('email'), $request->input('password'), $ldapHost);
+        if(!$check_pass){
+            return response()->json(['message' => 'Email or password is not correct.'], 500);
+        }
+        $user = User::where('email', $request->input('email'))->first();
+        if (!$user) {
+            $user = new User();
+            $user->email = $request->input('email');
+            $user->name = $request->input('email');
+            $user->save();
+        }
+        auth()->login($user);
+        $token = $user->createToken('API Token',['view-user'])->accessToken;
+        
+        return response()->json(['access_token' => $token], 200);
+
+        // $redirectUrl = session('url')['intended'];
+        
+        // return Redirect::to($redirectUrl);
+    }
     function bindldap($user, $pass, $ldapHost)
     {
         $ldaprdn = str_replace("@gosu.vn", "", $user) . "@gosu.vn";
@@ -144,5 +174,16 @@ class CustomLoginController extends Controller
         }
 
         return false;
+    }
+    public function customeOauthAuthrize(Request $request)
+    {
+        $redirectUrl = $request->fullUrl();
+        dd($redirectUrl);
+
+        session(['url' => ['intended'=>$redirectUrl]]);
+        
+        // return Redirect::to($redirectUrl);
+        return redirect()->route('login');
+
     }
 }
