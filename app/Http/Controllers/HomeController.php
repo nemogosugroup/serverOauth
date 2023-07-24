@@ -33,7 +33,6 @@ class HomeController extends Controller
         Auth::logout();
         Session::put('url.intended', $request->current_url);
         return redirect("login");
-
     }
 
     public function resetAuth(array $guards = null)

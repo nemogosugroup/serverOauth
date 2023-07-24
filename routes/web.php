@@ -23,4 +23,6 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::post('/different-account', [App\Http\Controllers\HomeController::class, 'differentAccount'])->name('different-account');
 Route::get('/reset-auth', [App\Http\Controllers\HomeController::class, 'resetAuth'])->name('reset-auth');
 Route::get('/login', [App\Http\Controllers\Auth\CustomLoginController::class, 'showLoginForm'])->name('login');
+
+// Route::get('/oauth/authorize', [App\Http\Controllers\Auth\CustomLoginController::class, 'showLoginForm'])->name('oAuth');
 Route::post('/login', [App\Http\Controllers\Auth\CustomLoginController::class, 'login'])->name('login');
