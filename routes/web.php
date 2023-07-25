@@ -24,5 +24,6 @@ Route::post('/different-account', [App\Http\Controllers\HomeController::class, '
 Route::get('/reset-auth', [App\Http\Controllers\HomeController::class, 'resetAuth'])->name('reset-auth');
 Route::get('/login', [App\Http\Controllers\Auth\CustomLoginController::class, 'showLoginForm'])->name('login');
 
+Route::get('/logout', [App\Http\Controllers\Auth\CustomLoginController::class, 'logout'])->name('logout');
 // Route::get('/oauth/authorize', [App\Http\Controllers\Auth\CustomLoginController::class, 'showLoginForm'])->name('oAuth');
 Route::post('/login', [App\Http\Controllers\Auth\CustomLoginController::class, 'login'])->name('login');

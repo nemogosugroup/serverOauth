@@ -28,26 +28,80 @@ class CustomLoginController extends Controller
 
     public function showLoginForm(Request $request)
     {
-        // $previousUrl = $request->fullUrl();
-        // $parsedUrl = parse_url($previousUrl);
-        
-        // // Extract the query string component from the parsed URL
-        // $queryString = isset($parsedUrl['query']) ? $parsedUrl['query'] : '';
+        $previousUrl = $request->fullUrl();
+        $parsedUrl = parse_url($previousUrl);
 
+        $queryString = isset($parsedUrl['query']) ? $parsedUrl['query'] : '';
         // // Parse the query string into an array of parameters
-        // parse_str($queryString, $queryParams);
+        parse_str($queryString, $queryParams);
 
         // // Retrieve the value of a specific query parameter
-        // $clientId = isset($queryParams['client_id']) ? $queryParams['client_id'] : null;
-        // $prompt = isset($queryParams['prompt']) ? $queryParams['prompt'] : null;
-        // $redirectUri = isset($queryParams['redirect_uri']) ? $queryParams['redirect_uri'] : null;
-        // $responseType = isset($queryParams['response_type']) ? $queryParams['response_type'] : null;
-        // $scope = isset($queryParams['scope']) ? $queryParams['scope'] : null;
-        // $state = isset($queryParams['state']) ? $queryParams['state'] : null;
+        $clientId = isset($queryParams['client_id']) ? $queryParams['client_id'] : null;
+        $prompt = isset($queryParams['prompt']) ? $queryParams['prompt'] : null;
+        $redirectUrl = isset($queryParams['redirect_uri']) ? $queryParams['redirect_uri'] : null;
+        $responseType = isset($queryParams['response_type']) ? $queryParams['response_type'] : null;
+        $scope = isset($queryParams['scope']) ? $queryParams['scope'] : null;
+        $state = isset($queryParams['state']) ? $queryParams['state'] : null;
+        
+        if (isset($redirectUrl)) {
+            if (Auth::check()) {
+                $token = $request->session()->get("access_token");
+                $token = $token ?? $user->createToken('API Token', ['view-user'])->accessToken;
+                $request->session()->put('access_token', $token);
+                return Redirect::to($redirectUrl . '?token=' . $token . '&state=' . $state);
+            }else{
+                // Lưu giá trị $parsedUrl['query'] vào session
+                $request->session()->put("state", $state);
+                $request->session()->put('redirectUrl', $redirectUrl);
+            }
+        }
         return view('auth.login');
     }
 
     public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+        $ldapHost = "222.255.168.250"; // Địa chỉ IP của máy chủ LDAP
+        // $bindResult = bindldap($user, $pass, $ldapHost);
+        $check_pass = $this->bindldap($request->input('email'), $request->input('password'), $ldapHost);
+        if(!$check_pass){
+            return redirect('/login')->with(
+                [
+                    'message' => 'Email or password is not correct.',
+                    'email' => $request->input('email'),
+                ]
+            );
+        }
+        $user = User::where('email', $request->input('email'))->first();
+        if (!$user) {
+            $user = new User();
+            $user->email = $request->input('email');
+            $user->name = $request->input('email');
+            $user->save();
+        }
+        auth()->login($user);
+        // $redirectUrl = session('url')['intended'];
+        $redirectUrl = session('redirectUrl');
+        $state = session('state');
+        
+        if($redirectUrl){
+            $token = $user->createToken('API Token',['view-user'])->accessToken;
+            $request->session()->put('access_token',$token);
+            return Redirect::to($redirectUrl. '?token=' . $token.'&state='.$state);
+        }else{
+            return Redirect::to("/home");
+        }
+        
+        throw ValidationException::withMessages([
+            'email' => [trans('auth.failed')],
+        ]);
+    }
+
+    // chưa sử dụng thư viện này vì có nhiều thứ không custom dc được
+    public function loginPassPost(Request $request)
     {
         $request->validate([
             'email' => 'required|email',
@@ -196,15 +250,32 @@ class CustomLoginController extends Controller
 
         return false;
     }
-    public function customeOauthAuthrize(Request $request)
+    /**
+     * Log the user out of the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    public function logout(Request $request)
     {
-        $redirectUrl = $request->fullUrl();
-        dd($redirectUrl);
-
-        session(['url' => ['intended'=>$redirectUrl]]);
         
-        // return Redirect::to($redirectUrl);
-        return redirect()->route('login');
+        if (Auth::check()) {
+            // Người dùng đã đăng nhập, thực hiện mã lệnh tại đây
+            Auth::logout();
+        }
 
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        $sessionCookieName = config('session.cookie');
+        $response = new \Illuminate\Http\Response();
+        if ($response = $this->loggedOut($request)) {
+            return $response;
+        }
+        $previousUrl = $request->fullUrl();
+        $parsedUrl = parse_url($previousUrl);
+        // dd($parsedUrl);
+        $queryString = isset($parsedUrl['query']) ? $parsedUrl['query'] : '';
+        return Redirect::to("/login". '?' . $queryString);
     }
 }
