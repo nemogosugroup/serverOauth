@@ -46,48 +46,35 @@
                         </div>
                         <div class="row g-0 justify-content-center">
                             <div class="col-sm-8 col-xl-6">
-                            {{-- @php dump(session()->all()) @endphp --}}
-                            <form method="POST" action="{{ route('login') }}">
-                                @csrf
-                                <div class="py-3">
-                                {{-- <div class="mb-4">
-                                    <input type="text" class="form-control form-control-lg form-control-alt" id="login-username" name="login-username" placeholder="Username">
-                                </div> --}}
-                                    {{-- <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label> --}}
+                                <form method="POST" action="{{ route('login') }}">
+                                    @csrf
+                                    <div class="py-3">
+                                        <div class="mb-4">
+                                            <input id="email" type="email" class="form-control form-control-lg form-control-alt @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" placeholder="{{ __('E-Mail Address') }}" autofocus>
 
-                                    <div class="mb-4">
-                                        <input id="email" type="email" class="form-control form-control-lg form-control-alt @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" placeholder="{{ __('E-Mail Address') }}" autofocus>
+                                            @error('email')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
+                                        </div>
+                                        <div class="mb-4">
+                                            <input id="password" type="password" class="form-control form-control form-control-lg form-control-alt @error('password') is-invalid @enderror" placeholder="{{ __('Password') }}" name="password" required autocomplete="current-password">
 
-                                        @error('email')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
+                                            @error('password')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
+                                        </div>
                                     </div>
-
-
-                                    {{-- <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}</label> --}}
-
                                     <div class="mb-4">
-                                        <input id="password" type="password" class="form-control form-control form-control-lg form-control-alt @error('password') is-invalid @enderror" placeholder="{{ __('Password') }}" name="password" required autocomplete="current-password">
+                                        <button type="submit" class="btn btn-primary text-white btn w-100 btn-lg btn-hero btn-warning"><i class="fa fa-fw fa-sign-in-alt me-1"></i> 
+                                            {{ __('Đăng nhập') }}
+                                        </button>
 
-                                        @error('password')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
                                     </div>
-                                </div>
-                                <div class="mb-4">
-                                    {{-- <button type="submit" class="btn w-100 btn-lg btn-hero btn-primary">
-                                        <i class="fa fa-fw fa-sign-in-alt opacity-50 me-1"></i> Sign In
-                                    </button> --}}
-                                    <button type="submit" class="btn btn-primary text-white btn w-100 btn-lg btn-hero btn-warning"><i class="fa fa-fw fa-sign-in-alt me-1"></i> 
-                                        {{ __('Đăng nhập') }}
-                                    </button>
-
-                                </div>
-                            </form>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -107,4 +94,11 @@
         </main>
     </div>
 </body>
+<script>
+    // Kiểm tra nếu có giá trị trong session
+    var message = "{{ session('message') }}";
+    if (message) {
+        alert(message);
+    }
+</script>
 </html>
