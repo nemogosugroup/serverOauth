@@ -23,11 +23,27 @@ class CustomLoginController extends Controller
 
     public function __construct()
     {
-        $this->middleware('guest')->except('logout');
+        // $this->middleware('guest')->except('logout');
     }
 
-    public function showLoginForm()
+    public function showLoginForm(Request $request)
     {
+        // $previousUrl = $request->fullUrl();
+        // $parsedUrl = parse_url($previousUrl);
+        
+        // // Extract the query string component from the parsed URL
+        // $queryString = isset($parsedUrl['query']) ? $parsedUrl['query'] : '';
+
+        // // Parse the query string into an array of parameters
+        // parse_str($queryString, $queryParams);
+
+        // // Retrieve the value of a specific query parameter
+        // $clientId = isset($queryParams['client_id']) ? $queryParams['client_id'] : null;
+        // $prompt = isset($queryParams['prompt']) ? $queryParams['prompt'] : null;
+        // $redirectUri = isset($queryParams['redirect_uri']) ? $queryParams['redirect_uri'] : null;
+        // $responseType = isset($queryParams['response_type']) ? $queryParams['response_type'] : null;
+        // $scope = isset($queryParams['scope']) ? $queryParams['scope'] : null;
+        // $state = isset($queryParams['state']) ? $queryParams['state'] : null;
         return view('auth.login');
     }
 
@@ -42,7 +58,12 @@ class CustomLoginController extends Controller
         // $bindResult = bindldap($user, $pass, $ldapHost);
         $check_pass = $this->bindldap($request->input('email'), $request->input('password'), $ldapHost);
         if(!$check_pass){
-            return response()->json(['message' => 'Email or password is not correct.'], 500);
+            return redirect('/login')->with(
+                [
+                    'message' => 'Email or password is not correct.',
+                    'email' => $request->input('email'),
+                ]
+            );
         }
         $user = User::where('email', $request->input('email'))->first();
         if (!$user) {
@@ -52,7 +73,7 @@ class CustomLoginController extends Controller
             $user->save();
         }
         auth()->login($user);
-
+// "http://localhost:8080?callback&response_type=code&scope=view-user&state=VNd4BHhpFtBvuD9iRvQHHKYHuckfezsdInTLP06S"
         $redirectUrl = session('url')['intended'];
 
         // $credentials = $request->only('email', 'password');
