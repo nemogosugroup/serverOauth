@@ -46,6 +46,7 @@ class CustomLoginController extends Controller
         if (isset($redirectUrl)) {
             if (Auth::check()) {
                 $token = $request->session()->get("access_token");
+                $user = Auth::user(); // Lấy thông tin người dùng hiện tại
                 $token = $token ?? $user->createToken('API Token', ['view-user'])->accessToken;
                 $request->session()->put('access_token', $token);
                 return Redirect::to($redirectUrl . '?token=' . $token . '&state=' . $state);
