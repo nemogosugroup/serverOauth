@@ -40,7 +40,7 @@
                         {{-- <div class="card-header">{{ __('Login') }}</div> --}}
                         <div class="mb-3 text-center">
                             <a class="link-fx fw-bold fs-1" href="#">
-                              <img src="{{ asset('assets/media/photos/logo-gosu.png') }}"  alt="Logo">
+                              <img src="{{ asset('assets/media/photos/GOSU_logo2023.png') }}" height="80" alt="Logo">
                             </a>
                             <p class="text-uppercase fw-bold fs-sm text-muted mt-3">{{ __('Đăng nhập bằng mail Gosu') }}</p>
                         </div>
