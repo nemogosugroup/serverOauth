@@ -32,6 +32,9 @@ class CustomLoginController extends Controller
         $parsedUrl = parse_url($previousUrl);
 
         $queryString = isset($parsedUrl['query']) ? $parsedUrl['query'] : '';
+        if($queryString){
+            $request->session()->put('parsedUrlQuery', $queryString);
+        }
         // // Parse the query string into an array of parameters
         parse_str($queryString, $queryParams);
 
@@ -69,9 +72,11 @@ class CustomLoginController extends Controller
         // $bindResult = bindldap($user, $pass, $ldapHost);
         $check_pass = $this->bindldap($request->input('email'), $request->input('password'), $ldapHost);
         if(!$check_pass){
-            return redirect('/login')->with(
+            $queryString = session('parsedUrlQuery') ?? "";
+            // dd($previousUrl);
+            return redirect('/login?'.$queryString)->with(
                 [
-                    'message' => 'Email or password is not correct.',
+                    'message' => 'Tài khoản hoặc mật khẩu không đúng!',
                     'email' => $request->input('email'),
                 ]
             );
