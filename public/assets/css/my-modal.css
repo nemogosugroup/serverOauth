@@ -1,0 +1,48 @@
+/* Style cho modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+/* Styles cho nội dung của modal */
+.modal-content {
+  background-color: #fefefe;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 60%;
+}
+
+/* Styles cho header, footer, title */
+.modal-header, .modal-footer {
+  padding: 10px 15px;
+  text-align: center;
+}
+
+/* Close button style */
+.close {
+  color: #aaa;
+  float: right;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Custom styles for title */
+.modal-title {
+  margin: 0;
+  font-size: 24px;
+  text-align: center;
+}

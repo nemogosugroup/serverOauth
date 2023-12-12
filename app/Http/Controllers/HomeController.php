@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sidebar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use App\Models\Vote;
 
 class HomeController extends Controller
 {
@@ -25,7 +27,29 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $sidebarAll = Sidebar::all()->toArray();
+        $sidebarParent = [];
+        $sidebarChirl = [];
+        foreach ($sidebarAll as $value) {
+            if($value['type'] == 0){
+                $sidebarParent[] =$value;
+            }else{
+                $sidebarChirl[] = $value;
+            }
+        }
+        foreach ($sidebarParent as &$value) {
+            if (!isset($value['chirl'])) {
+                $value['chirl'] = [];
+            }
+            foreach ($sidebarChirl as $valueChirl) {
+                if($valueChirl['parent'] == $value['id']){
+                    $value['chirl'][] =$valueChirl;
+                }
+            }
+            
+        }
+        // dump($sidebarParent);die;
+        return view('home')->with('sidebarAll', $sidebarParent);
     }
 
     public function differentAccount(Request $request)

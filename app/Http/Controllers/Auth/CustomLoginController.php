@@ -58,10 +58,41 @@ class CustomLoginController extends Controller
                 $request->session()->put("state", $state);
                 $request->session()->put('redirectUrl', $redirectUrl);
             }
+        }else{
+            $request->session()->forget("state");
+            $request->session()->forget('redirectUrl');
         }
         return view('auth.login');
     }
 
+    public function checkLogin(Request $request)
+    {
+        // $user = $request->user();
+        // dump(Auth::check());die;
+        if (Auth::check()) {
+            $user = Auth::user(); // Lấy thông tin người dùng hiện tại
+            $token = $token ?? $user->createToken('API Token', ['view-user'])->accessToken;
+            return response()->json([
+                'success' => true,
+                'message' =>"success",
+                'status' => 200,
+                'data' => [
+                    'access_token' => $token
+                ]
+                
+            ], 200);
+        }
+        return response()->json([
+            'success' => false,
+            'message' =>"false",
+            'status' => 200,
+            'data' => [
+                'access_token' => ""
+            ]
+            
+        ], 200);
+
+    }
     public function login(Request $request)
     {
         $request->validate([
@@ -93,11 +124,14 @@ class CustomLoginController extends Controller
         $redirectUrl = session('redirectUrl');
         $state = session('state');
         
+        $token = $user->createToken('API Token',['view-user'])->accessToken;
+        $request->session()->put('access_token',$token);
+        
         if($redirectUrl){
-            $token = $user->createToken('API Token',['view-user'])->accessToken;
-            $request->session()->put('access_token',$token);
             return Redirect::to($redirectUrl. '?token=' . $token.'&state='.$state);
         }else{
+            $request->session()->forget("state");
+            $request->session()->forget('redirectUrl');
             return Redirect::to("/home");
         }
         

@@ -53,6 +53,7 @@ Route::middleware('auth:api')->get('/logmeout', function (Request $request) {
     ]);
 });
 Route::post('/login', [App\Http\Controllers\Auth\CustomLoginController::class, 'login'])->name('login');
+Route::get('/check-login', [App\Http\Controllers\Auth\CustomLoginController::class, 'checkLogin'])->name('check-login');
 Route::post('/app-login', [App\Http\Controllers\Auth\CustomLoginController::class, 'appLogin'])->name('app-login');
 
 Route::middleware('auth:api')->group(function () {

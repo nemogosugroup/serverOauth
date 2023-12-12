@@ -1,23 +1,21 @@
 @extends('layouts.app')
 
+@section('header')
+    @include('layouts.header')
+@endsection
+
+@section('left-sidebar')
+    @include('layouts.left-sidebar')
+@endsection
+
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Dashboard') }}</div>
+    @include('layouts.content')  
+@endsection
 
-                <div class="card-body">
-                    @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
+@section('footer')
+    @include('layouts.footer')
+@endsection
 
-                    {{ __('You are logged in!') }}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+@section('scripts')
+    <script src="{{ asset('assets/js/left-sidebar-modal.js') }}"></script>
 @endsection
